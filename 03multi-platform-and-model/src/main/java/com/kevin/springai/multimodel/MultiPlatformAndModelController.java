@@ -7,6 +7,7 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -17,7 +18,7 @@ import java.util.Map;
 @RestController
 public class MultiPlatformAndModelController {
 
-    private Map<String, ChatModel> platforms = new HashMap<>();
+    private final Map<String, ChatModel> platforms = new HashMap<>();
 
     public MultiPlatformAndModelController(
             DashScopeChatModel dashScopeChatModel,
@@ -31,7 +32,7 @@ public class MultiPlatformAndModelController {
 
     @GetMapping(value = "/chat", produces = "text/stream;charset=UTF-8")
     public Flux<String> chat(@RequestParam String message,
-                             MultiPlatformAndModelOptions options) {
+                             @ModelAttribute MultiPlatformAndModelOptions options) {
         String platform = options.getPlatform();
         ChatModel chatModel = platforms.get(platform);
 
@@ -44,7 +45,6 @@ public class MultiPlatformAndModelController {
                 )
                 .build();
 
-        Flux<String> content = chatClient.prompt().user(message).stream().content();
-        return content;
+        return chatClient.prompt().user(message).stream().content();
     }
 }
