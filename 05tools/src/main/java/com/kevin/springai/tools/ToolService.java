@@ -1,11 +1,18 @@
 package com.kevin.springai.tools;
 
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
+import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.method.MethodToolCallback;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ReflectionUtils;
+
+import java.lang.reflect.Method;
+import java.util.List;
 
 @Service
 public class ToolService {
@@ -27,5 +34,43 @@ public class ToolService {
     public String getAirQuality(@ToolParam(description = "纬度") double latitude,
                                 @ToolParam(description = "经度") double longitude) {
         return "天晴";
+    }
+
+    /**
+     * 模拟从数据库中动态根据当前用户角色读取Tools
+     */
+    public List<ToolCallback> getToolCallList(ToolService toolService) {
+        // 从数据库中读取的代码，略
+        // 以获取到一个Tool为例
+
+        // 1. 获取Tools处理的方法
+        Method method = ReflectionUtils.findMethod(ToolService.class, "cancel", String.class, String.class);
+        // 2. 构建ToolDefinition对象
+        ToolDefinition toolDefinition = ToolDefinition.builder()
+                .name("cancel")
+                .description("退票")
+                .inputSchema("""
+                        {
+                            "type": "object",
+                            "properties": {
+                                "ticketNumber": {
+                                    "type": "string",
+                                    "description": "预定号"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "姓名"
+                                }
+                            },
+                            "required": ["ticketNumber", "name"]
+                        }
+                        """)
+                .build();
+        // 3. 构建ToolCallback
+        return List.of(MethodToolCallback.builder()
+                .toolDefinition(toolDefinition)
+                .toolMethod(method)
+                .toolObject(toolService)    // 使用Spring管理的Bean
+                .build());
     }
 }
