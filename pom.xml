@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.kevin.springai</groupId>
-	<artifactId>spring-ai-parent</artifactId>
+	<artifactId>spring-ai</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>spring-ai</name>
 	<description>spring-ai</description>
@@ -16,6 +16,7 @@
 		<module>03multi-platform-and-model</module>
 		<module>04multi-model-structured-agent</module>
 		<module>05tools</module>
+		<module>06flight-booking</module>
 	</modules>
 
 	<properties>
