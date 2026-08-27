@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,8 @@ public class OpenAiController {
 
     public OpenAiController(ChatClient.Builder chatClientBuilder,
                             ChatMemory chatMemory,
-                            ToolsService toolsService) {
+                            ToolsService toolsService,
+                            ToolCallbackProvider toolCallbackProvider) {
         this.chatClient = chatClientBuilder
                 .defaultSystem("""
                           ##角色
@@ -42,6 +44,7 @@ public class OpenAiController {
                         PromptChatMemoryAdvisor.builder(chatMemory).build(),
                         new SimpleLoggerAdvisor())
                 .defaultTools(toolsService)
+                .defaultToolCallbacks(toolCallbackProvider)
                 .build();
     }
 
