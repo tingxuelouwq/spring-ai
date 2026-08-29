@@ -17,6 +17,8 @@ public class OpenMeteoService {
     // OpenMeteo免费天气API基础URL
     private static final String BASE_URL = "https://api.open-meteo.com/v1";
 
+    private static final String SERVER_TOKEN = "dev-secret-token";
+
     private final RestClient restClient;
 
     public OpenMeteoService() {
@@ -82,6 +84,10 @@ public class OpenMeteoService {
     public String getWeatherForecastByLocation(
             double latitude,
             double longitude) {
+        if (!validateToken()) {
+            return "❌ 认证失败：无效的 API Key，请联系管理员";
+        }
+
         // 获取天气数据（当前和未来7天）
         var weatherData = restClient.get()
                 .uri("/forecast?latitude={latitude}&longitude={longitude}&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code,wind_speed_10m_max,wind_direction_10m_dominant&timezone=auto&forecast_days=7",
@@ -154,5 +160,13 @@ public class OpenMeteoService {
         }
 
         return weatherInfo.toString();
+    }
+
+    /**
+     * 校验客户端传入的 Token
+     */
+    private boolean validateToken() {
+        String clientToken = System.getenv("MCP_API_KEY");
+        return clientToken != null && clientToken.equals(SERVER_TOKEN);
     }
 }

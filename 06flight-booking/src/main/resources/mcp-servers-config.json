@@ -7,7 +7,10 @@
         "-Dlogging.level.root=OFF",
         "-jar",
         "D:\\Workspace\\Idea\\spring-ai\\07mcp-stdio-server\\target\\07mcp-stdio-server-0.0.1-SNAPSHOT.jar"
-      ]
+      ],
+      "env": {
+        "MCP_API_KEY": "dev-secret-token"
+      }
     }
   }
 }
