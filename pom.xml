@@ -19,6 +19,7 @@
 		<module>06flight-booking</module>
 		<module>07mcp-stdio-server</module>
 		<module>08mcp-sse-server</module>
+		<module>09rag</module>
 	</modules>
 
 	<properties>
