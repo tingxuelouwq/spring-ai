@@ -1,0 +1,8 @@
+spring:
+  ai:
+    mcp:
+      server:
+        name: my-user-tool
+        version: 0.0.1
+server:
+  port: 8088
