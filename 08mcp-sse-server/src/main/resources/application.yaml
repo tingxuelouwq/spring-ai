@@ -4,5 +4,18 @@ spring:
       server:
         name: my-user-tool
         version: 0.0.1
+  security:
+    oauth2:
+      authorizationserver:
+        client:
+          mcp-client:
+            registration:
+              client-id: kevin
+              client-secret: "{noop}kevin666"
+              client-authentication-methods:
+                - client_secret_basic
+              authorization-grant-types:
+                - client_credentials
+
 server:
   port: 8088
