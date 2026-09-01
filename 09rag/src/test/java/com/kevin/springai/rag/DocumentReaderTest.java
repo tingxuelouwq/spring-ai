@@ -5,6 +5,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
+import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
@@ -38,6 +40,15 @@ public class DocumentReaderTest {
             System.out.println(document.getText());
             System.out.println(document.getMetadata());
             System.out.println("--------------------------");
+        }
+    }
+
+    @Test
+    public void testReadPdf(@Value("classpath:rag/平安银行2023年半年度报告摘要.pdf") Resource resource) {
+        PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource);
+        List<Document> documents = pdfReader.read();
+        for (Document document : documents) {
+            System.out.println(document.getText());
         }
     }
 }
