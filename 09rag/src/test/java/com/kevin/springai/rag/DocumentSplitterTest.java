@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.model.transformer.KeywordMetadataEnricher;
+import org.springframework.ai.model.transformer.SummaryMetadataEnricher;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
@@ -61,7 +62,6 @@ public class DocumentSplitterTest {
     @Test
     public void testKeywordMetadataEnricher(
             @Autowired DashScopeChatModel chatModel,
-            @Autowired VectorStore vectorStore,
             @Value("classpath:rag/terms-of-service.txt") Resource resource) {
 
         TextReader textReader = new TextReader(resource);
@@ -93,6 +93,29 @@ public class DocumentSplitterTest {
 
         for (Document document : documents) {
             System.out.println(document.getMetadata());
+        }
+    }
+
+    @Test
+    public void testSummaryMetadataEnricher(@Autowired DashScopeChatModel chatModel,
+                                            @Value("classpath:rag/terms-of-service.txt") Resource resource) {
+
+        TextReader textReader = new TextReader(resource);
+        textReader.getCustomMetadata().put("filename", resource.getFilename());
+        List<Document> documents = textReader.read();
+
+        ChineseTokenTextSplitter splitter = new ChineseTokenTextSplitter(130, 10, 5, 10000, true);
+        documents = splitter.apply(documents);
+
+        SummaryMetadataEnricher enricher = new SummaryMetadataEnricher(chatModel,
+                List.of(SummaryMetadataEnricher.SummaryType.PREVIOUS,
+                        SummaryMetadataEnricher.SummaryType.CURRENT,
+                        SummaryMetadataEnricher.SummaryType.NEXT));
+        documents = enricher.apply(documents);
+
+        for (Document document : documents) {
+            System.out.println(document.getMetadata());
+            System.out.println("----------------------");
         }
     }
 }

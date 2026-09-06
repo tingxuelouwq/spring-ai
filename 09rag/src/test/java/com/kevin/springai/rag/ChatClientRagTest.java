@@ -5,8 +5,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
+import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
+import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQueryTransformer;
+import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.SimpleVectorStore;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -19,6 +26,9 @@ import java.util.List;
 
 @SpringBootTest
 public class ChatClientRagTest {
+
+    @Autowired
+    private VectorStore vectorStore;
 
     @TestConfiguration
     static class TestConfig {
@@ -65,11 +75,58 @@ public class ChatClientRagTest {
                 .advisors(
                         SimpleLoggerAdvisor.builder().build(),
                         QuestionAnswerAdvisor.builder(vectorStore)
-                        .searchRequest(SearchRequest.builder()
-                                .topK(5)
-                                .similarityThreshold(0.4)
+                                .searchRequest(SearchRequest.builder()
+                                        .similarityThreshold(0.9)
+                                        .topK(5)
+                                        .build())
+                                .build())
+                .call()
+                .content();
+
+        System.out.println(content);
+    }
+
+    @Test
+    public void testRagAdvisor(@Autowired ChatClient.Builder chatClientBuilder,
+                               @Autowired VectorStore vectorStore) {
+        ChatClient chatClient = chatClientBuilder
+                .defaultAdvisors(SimpleLoggerAdvisor.builder().build())
+                .build();
+
+        Advisor retrievalAugmentationAdvisor = RetrievalAugmentationAdvisor.builder()
+                // 文档检索器
+                .documentRetriever(VectorStoreDocumentRetriever.builder()
+                        .similarityThreshold(0.0)
+                        .topK(5)
+                        .vectorStore(vectorStore)
+                        .build())
+                .queryAugmenter(ContextualQueryAugmenter.builder()
+                        .allowEmptyContext(false)
+                        .emptyContextPromptTemplate(PromptTemplate.builder()
+                                .template("用户查询位于知识库之外。礼貌地告知用户您无法回答")
                                 .build())
                         .build())
+                // 重写检索查询转换器
+                .queryTransformers(RewriteQueryTransformer.builder()
+                        .chatClientBuilder(chatClientBuilder)
+                        .targetSearchSystem("航空票务助手")
+                        .build())
+                // 翻译检索查询转换器
+                .queryTransformers(TranslationQueryTransformer.builder()
+                        .chatClientBuilder(chatClientBuilder)
+                        .targetLanguage("english")
+                        .build())
+                // 后检索处理器
+                .documentPostProcessors((query, documents) -> {
+                    System.out.println("Original query: " + query.text());
+                    System.out.println("Retrieved documents: " + documents.size());
+                    return documents;
+                })
+                .build();
+
+        String content = chatClient.prompt()
+                .advisors(retrievalAugmentationAdvisor)
+                .user("我今天心情不好，不想去玩了，你能不能告诉我退票需要多少钱？")
                 .call()
                 .content();
 
