@@ -27,9 +27,6 @@ import java.util.List;
 @SpringBootTest
 public class ChatClientRagTest {
 
-    @Autowired
-    private VectorStore vectorStore;
-
     @TestConfiguration
     static class TestConfig {
 
