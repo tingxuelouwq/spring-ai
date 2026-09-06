@@ -1,5 +1,10 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.service;
 
+import com.kevin.springai.flightbooking.dto.Booking;
+import com.kevin.springai.flightbooking.dto.BookingData;
+import com.kevin.springai.flightbooking.dto.Customer;
+import com.kevin.springai.flightbooking.enums.BookingClass;
+import com.kevin.springai.flightbooking.enums.BookingStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;

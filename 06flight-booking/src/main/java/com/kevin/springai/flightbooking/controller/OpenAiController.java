@@ -1,10 +1,14 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.controller;
 
+import com.kevin.springai.flightbooking.service.ToolsService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +28,13 @@ import java.time.LocalDate;
 public class OpenAiController {
 
     private final ChatClient chatClient;
+    private final VectorStore vectorStore;
 
     public OpenAiController(ChatClient.Builder chatClientBuilder,
                             ChatMemory chatMemory,
                             ToolsService toolsService,
-                            ToolCallbackProvider toolCallbackProvider) {
+                            ToolCallbackProvider toolCallbackProvider,
+                            VectorStore vectorStore) {
         this.chatClient = chatClientBuilder
                 .defaultSystem("""
                           ##角色
@@ -46,6 +52,8 @@ public class OpenAiController {
                 .defaultTools(toolsService)
                 .defaultToolCallbacks(toolCallbackProvider)
                 .build();
+
+        this.vectorStore = vectorStore;
     }
 
     @GetMapping(value = "/ai/generateStreamAsString", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
@@ -53,6 +61,12 @@ public class OpenAiController {
         return chatClient.prompt()
                 .user(message)
                 .system(p -> p.param("current_date", LocalDate.now()))
+                .advisors(QuestionAnswerAdvisor.builder(vectorStore)
+                        .searchRequest(SearchRequest.builder()
+                                .topK(3)
+                                .similarityThreshold(0.5)
+                                .build())
+                        .build())
                 .stream().content();
     }
 

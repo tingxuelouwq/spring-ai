@@ -1,4 +1,4 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.dto;
 
 import java.util.ArrayList;
 import java.util.List;

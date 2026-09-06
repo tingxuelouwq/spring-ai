@@ -1,5 +1,6 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.controller;
 
+import com.kevin.springai.flightbooking.service.FlightBookingService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

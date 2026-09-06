@@ -1,4 +1,4 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.enums;
 
 public enum BookingClass {
 

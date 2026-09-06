@@ -1,4 +1,4 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.service;
 
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;

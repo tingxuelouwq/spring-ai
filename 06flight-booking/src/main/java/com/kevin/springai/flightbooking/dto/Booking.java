@@ -1,4 +1,7 @@
-package com.kevin.springai.flightbooking;
+package com.kevin.springai.flightbooking.dto;
+
+import com.kevin.springai.flightbooking.enums.BookingClass;
+import com.kevin.springai.flightbooking.enums.BookingStatus;
 
 import java.time.LocalDate;
 
