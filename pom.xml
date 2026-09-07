@@ -20,6 +20,7 @@
 		<module>07mcp-stdio-server</module>
 		<module>08mcp-sse-server</module>
 		<module>09rag</module>
+		<module>10observability-actuator</module>
 	</modules>
 
 	<properties>

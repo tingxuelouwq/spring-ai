@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: 10observability-actuator
+
+  ai:
+    deepseek:
+      api-key: ${DEEP_SEEK_KEY}
+      chat:
+        options:
+          model: deepseek-v4-flash
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
