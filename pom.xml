@@ -21,6 +21,7 @@
 		<module>08mcp-sse-server</module>
 		<module>09rag</module>
 		<module>10observability-actuator</module>
+		<module>11agent</module>
 	</modules>
 
 	<properties>

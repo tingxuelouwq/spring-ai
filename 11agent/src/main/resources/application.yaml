@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: 11agent
+
+  ai:
+    dashscope:
+      api-key: ${ALI_AI_KEY}
+      chat:
+        options:
+          model: deepseek-v4-flash-0731
